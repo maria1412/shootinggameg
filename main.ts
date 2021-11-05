@@ -3,10 +3,24 @@ namespace SpriteKind {
     export const BulletB = SpriteKind.create()
     export const Enemy1 = SpriteKind.create()
 }
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.BulletB, function (sprite, otherSprite) {
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Bullet, function (sprite, otherSprite) {
     otherSprite.destroy()
     Enemy2Life += -1
     if (Enemy2Life == 0) {
+        info.changeScoreBy(10)
+        sprite.destroy()
+    }
+})
+sprites.onOverlap(SpriteKind.Enemy1, SpriteKind.BulletB, function (sprite, otherSprite) {
+    Enemy1Life += -10
+    if (Enemy1Life <= 0) {
+        info.changeScoreBy(10)
+        sprite.destroy()
+    }
+})
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.BulletB, function (sprite, otherSprite) {
+    Enemy2Life += -10
+    if (Enemy2Life <= 0) {
         info.changeScoreBy(10)
         sprite.destroy()
     }
@@ -63,13 +77,13 @@ sprites.onOverlap(SpriteKind.Enemy1, SpriteKind.Bullet, function (sprite, otherS
         sprite.destroy()
     }
 })
-let Enemy2: Sprite = null
 let statusbar3: StatusBarSprite = null
+let Enemy2: Sprite = null
 let statusbar2: StatusBarSprite = null
 let Enemy1: Sprite = null
-let Enemy1Life = 0
 let projectile: Sprite = null
 let ShootPower = 0
+let Enemy1Life = 0
 let Enemy2Life = 0
 let ChangeAnimFlag = 0
 let mySprite: Sprite = null
@@ -125,15 +139,11 @@ game.onUpdateInterval(2000, function () {
         Enemy1.setPosition(160, randint(5, 115))
         Enemy1.setVelocity(randint(-20, -40), 0)
         Enemy1Life = 5
-        Enemy2Life = 10
         statusbar2 = statusbars.create(20, 4, StatusBarKind.Health)
-        statusbar3 = statusbars.create(20, 4, StatusBarKind.Health)
         statusbar2.value = Enemy1Life
         statusbar2.max = 5
         statusbar2.attachToSprite(Enemy1)
-        statusbar3.attachToSprite(Enemy2)
         statusbar2.setColor(2, 12)
-        statusbar3.setColor(2, 12)
     } else {
         Enemy2 = sprites.create(img`
             .............ccfff..............
@@ -155,6 +165,12 @@ game.onUpdateInterval(2000, function () {
             `, SpriteKind.Enemy)
         Enemy2.setPosition(160, randint(5, 115))
         Enemy2.setVelocity(randint(-20, -40), randint(-20, 20))
+        statusbar3 = statusbars.create(20, 4, StatusBarKind.Health)
+        Enemy2Life = 10
+        statusbar3.value = Enemy2Life
+        statusbar3.max = 10
+        statusbar3.attachToSprite(Enemy2)
+        statusbar3.setColor(2, 12)
     }
 })
 game.onUpdateInterval(2000, function () {
