@@ -3,28 +3,15 @@ namespace SpriteKind {
     export const BulletB = SpriteKind.create()
     export const Enemy1 = SpriteKind.create()
 }
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Bullet, function (sprite, otherSprite) {
-    otherSprite.destroy()
-    if (Enemy1Life > 0) {
-        Enemy1Life += -1
-    } else if (Enemy1Life == 0) {
-        info.changeScoreBy(10)
-        sprite.destroy()
-    }
-    if (Enemy2Life > 0) {
-        Enemy2Life += -1
-    } else if (Enemy2Life == 0) {
-        info.changeScoreBy(10)
-        sprite.destroy()
-    }
-})
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.BulletB, function (sprite, otherSprite) {
-    sprite.destroy(effects.fire, 200)
-    info.changeScoreBy(20)
-    music.pewPew.play()
+    otherSprite.destroy()
+    Enemy2Life += -1
+    if (Enemy2Life == 0) {
+        info.changeScoreBy(10)
+        sprite.destroy()
+    }
 })
 controller.B.onEvent(ControllerButtonEvent.Released, function () {
-    ShootPower = 0
     if (ShootPower >= 80) {
         projectile = sprites.createProjectileFromSprite(img`
             ........................
@@ -66,15 +53,24 @@ controller.B.onEvent(ControllerButtonEvent.Released, function () {
         ..............................
         `)
     ChangeAnimFlag = 0
+    ShootPower = 0
+})
+sprites.onOverlap(SpriteKind.Enemy1, SpriteKind.Bullet, function (sprite, otherSprite) {
+    otherSprite.destroy()
+    Enemy1Life += -1
+    if (Enemy1Life == 0) {
+        info.changeScoreBy(10)
+        sprite.destroy()
+    }
 })
 let Enemy2: Sprite = null
 let statusbar3: StatusBarSprite = null
 let statusbar2: StatusBarSprite = null
 let Enemy1: Sprite = null
+let Enemy1Life = 0
 let projectile: Sprite = null
 let ShootPower = 0
 let Enemy2Life = 0
-let Enemy1Life = 0
 let ChangeAnimFlag = 0
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
@@ -105,6 +101,61 @@ statusbar.setColor(9, 12)
 ChangeAnimFlag = 0
 game.onUpdate(function () {
 	
+})
+game.onUpdateInterval(2000, function () {
+    if (Math.percentChance(70)) {
+        Enemy1 = sprites.create(img`
+            .....................
+            .....................
+            .....................
+            .........fff.........
+            .......66999ff.......
+            ......69999999f......
+            .....6699999996f.....
+            .....69999999996.....
+            ....c6999999999ff....
+            ..cccbf9999999fbbcf..
+            ccccbbbfffffffbbbbbff
+            ccbbbbbbbbbbbbbbbbbcf
+            .cccbbbbbbbbbbbbbfff.
+            ...cccbbbbbbbbbff....
+            ......ccccccccc......
+            .....................
+            `, SpriteKind.Enemy1)
+        Enemy1.setPosition(160, randint(5, 115))
+        Enemy1.setVelocity(randint(-20, -40), 0)
+        Enemy1Life = 5
+        Enemy2Life = 10
+        statusbar2 = statusbars.create(20, 4, StatusBarKind.Health)
+        statusbar3 = statusbars.create(20, 4, StatusBarKind.Health)
+        statusbar2.value = Enemy1Life
+        statusbar2.max = 5
+        statusbar2.attachToSprite(Enemy1)
+        statusbar3.attachToSprite(Enemy2)
+        statusbar2.setColor(2, 12)
+        statusbar3.setColor(2, 12)
+    } else {
+        Enemy2 = sprites.create(img`
+            .............ccfff..............
+            ...........ccdd5cf..............
+            ..........ccdd55f...............
+            ..........fcc55cf...............
+            .....fffffccccccff.........ccc..
+            ...ff5555555c5555cfff....cc55c..
+            ..f55555555cbc5555cccff.c555c...
+            ff555555aa55c5c555cccccfc555f...
+            f5c555bbaab5c55555cccccff55f....
+            f555bbbbbbbb55555ccccccc55cf....
+            .f5bbb33ccbb5555cccccccccccf....
+            ..fccc3bcbbb555ccccc555ff55cf...
+            ...fcb3cbbbc555fc5555cc..f55f...
+            ....fcccbbbf5d55cc5cc.....f55f..
+            ........ccccfcd55cc........fff..
+            .............fffff..............
+            `, SpriteKind.Enemy)
+        Enemy2.setPosition(160, randint(5, 115))
+        Enemy2.setVelocity(randint(-20, -40), randint(-20, 20))
+    }
 })
 game.onUpdateInterval(2000, function () {
 	
@@ -355,60 +406,5 @@ forever(function () {
         music.beamUp.play()
         pause(1000)
         ShootPower += 20
-    }
-})
-game.onUpdateInterval(500, function () {
-    if (Math.percentChance(70)) {
-        Enemy1 = sprites.create(img`
-            .....................
-            .....................
-            .....................
-            .........fff.........
-            .......66999ff.......
-            ......69999999f......
-            .....6699999996f.....
-            .....69999999996.....
-            ....c6999999999ff....
-            ..cccbf9999999fbbcf..
-            ccccbbbfffffffbbbbbff
-            ccbbbbbbbbbbbbbbbbbcf
-            .cccbbbbbbbbbbbbbfff.
-            ...cccbbbbbbbbbff....
-            ......ccccccccc......
-            .....................
-            `, SpriteKind.Enemy1)
-        Enemy1.setPosition(160, randint(5, 115))
-        Enemy1.setVelocity(randint(-20, -40), 0)
-        Enemy1Life = 5
-        Enemy2Life = 10
-        statusbar2 = statusbars.create(20, 4, StatusBarKind.Health)
-        statusbar3 = statusbars.create(20, 4, StatusBarKind.Health)
-        statusbar2.value = Enemy1Life
-        statusbar2.max = 5
-        statusbar2.attachToSprite(Enemy1)
-        statusbar3.attachToSprite(Enemy2)
-        statusbar2.setColor(2, 12)
-        statusbar3.setColor(2, 12)
-    } else {
-        Enemy2 = sprites.create(img`
-            .............ccfff..............
-            ...........ccdd5cf..............
-            ..........ccdd55f...............
-            ..........fcc55cf...............
-            .....fffffccccccff.........ccc..
-            ...ff5555555c5555cfff....cc55c..
-            ..f55555555cbc5555cccff.c555c...
-            ff555555aa55c5c555cccccfc555f...
-            f5c555bbaab5c55555cccccff55f....
-            f555bbbbbbbb55555ccccccc55cf....
-            .f5bbb33ccbb5555cccccccccccf....
-            ..fccc3bcbbb555ccccc555ff55cf...
-            ...fcb3cbbbc555fc5555cc..f55f...
-            ....fcccbbbf5d55cc5cc.....f55f..
-            ........ccccfcd55cc........fff..
-            .............fffff..............
-            `, SpriteKind.Enemy)
-        Enemy2.setPosition(160, randint(5, 115))
-        Enemy2.setVelocity(randint(-20, -40), randint(-20, 20))
     }
 })
